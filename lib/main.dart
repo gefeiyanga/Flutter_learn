@@ -66,6 +66,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     })
                   );
                 }),
+            Image(
+              image: AssetImage("imgs/dog.jpg"),
+              width: 60.0,
+            ),
+//            Image(
+//              image: NetworkImage(
+//                  "https://avatars2.githubusercontent.com/u/20411648?s=460&v=4"),
+//              width: 60.0,
+//            ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -148,24 +157,30 @@ class TipRoute extends StatelessWidget {
 class RouterTestRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: RaisedButton(
-        onPressed: () async {
-          // 打开`TipRoute`，并等待返回结果
-          var result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) {
-              return TipRoute(
-                // 路由参数
-                text: "我是提示xxxx啊"
+    return Container(
+      child: Column(
+        children: <Widget>[
+//          TextField(fasf
+          new RaisedButton(
+            onPressed: () async {
+              // 打开`TipRoute`，并等待返回结果
+              var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return TipRoute(
+                      // 路由参数
+                        text: "我是提示xxxx啊"
+                    );
+                  })
               );
-            })
-          );
-          // 输出`TipRoute`路由返回结果
-          print("路由返回值：$result");
-        },
-        child: Text("打开提示页"),
-      )
+              // 输出`TipRoute`路由返回结果
+              print("路由返回值：$result");
+            },
+          ),
+          new Text("打开提示页"),
+          new FocusTest(),
+        ],
+      ),
     );
   }
 }
@@ -221,7 +236,12 @@ class _CounterWidgetState extends State<CounterWidget> {
         title: Text('observe'),
       ),
       body: Center(
-        child: FlatButton(
+        child: RaisedButton(
+          color: Colors.blue,
+          highlightColor: Colors.blue[700],
+          colorBrightness: Brightness.dark,
+          splashColor: Colors.grey,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           child: Text('$_counter'),
           onPressed: ()=>setState(()=>++_counter),
         ),
@@ -263,8 +283,7 @@ class _CounterWidgetState extends State<CounterWidget> {
 class ObserveStateRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // return CounterWidget();
-    return Text('123');
+     return CounterWidget();
   }
 }
 
@@ -304,8 +323,8 @@ class _TapboxAState extends State<TapboxA> {
             style: new TextStyle(fontSize: 32.0, color: Colors.white),
           ),
         ),
-        width: 200.0,
-        height: 200.0,
+        width: 160.0,
+        height: 160.0,
         decoration: new BoxDecoration(
           color: _active ? Colors.lightGreen[700] : Colors.grey[600]
         ),
@@ -365,8 +384,8 @@ class TapboxB extends StatelessWidget {
             style: new TextStyle(fontSize: 32.0, color: Colors.white),
           ),
         ),
-        width: 200.0,
-        height: 200.0,
+        width: 160.0,
+        height: 160.0,
         decoration: new BoxDecoration(
           color: active ? Colors.lightGreen[700] : Colors.grey[600],
         ),
@@ -457,8 +476,8 @@ class _TapboxCState extends State<TapboxC> {
             style: new TextStyle(fontSize: 32.0, color: Colors.white),
           ),
         ),
-        width: 200.0,
-        height: 200.0,
+        width: 160.0,
+        height: 160.0,
         decoration: new BoxDecoration(
           color: widget.active ? Colors.lightGreen[700] : Colors.grey[600],
           border: _highlight ? new Border.all(
@@ -471,6 +490,66 @@ class _TapboxCState extends State<TapboxC> {
   }
 }
 
+class FocusTest extends StatefulWidget {
+  @override
+  _FocusTestState createState() => new _FocusTestState();
+}
+
+class _FocusTestState extends State<FocusTest> {
+  FocusNode focusNode1 = new FocusNode();
+  FocusNode focusNode2 = new FocusNode();
+  FocusScopeNode focusScopeNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        children: <Widget>[
+          TextField(
+            autofocus: true,
+            focusNode: focusNode1,
+            decoration: InputDecoration(
+              labelText: "input1"
+            ),
+          ),
+          TextField(
+            focusNode: focusNode2,
+            decoration: InputDecoration(
+              labelText: "input2"
+            ),
+          ),
+          Builder(builder: (ctx) {
+            return Column(
+              children: <Widget>[
+                RaisedButton(
+                  child: Text('移动焦点'),
+                  onPressed: () {
+                    // 将焦点从第一个TextField移动到第二个TextField
+                    // 第一种写法：
+                    // FocusScope.of(context).requestFocus(focusNode2);
+                    // 第二种写法：
+                    if(null == focusScopeNode) {
+                      focusScopeNode = FocusScope.of(context);
+                    }
+                    focusScopeNode.requestFocus(focusNode2);
+                  }
+                ),
+                RaisedButton(
+                  child: Text("隐藏键盘"),
+                  onPressed: () {
+                    focusNode1.unfocus();
+                    focusNode2.unfocus();
+                  }
+                ),
+              ],
+            );
+          })
+        ],
+      ),
+    );
+  }
+}
 
 
 
