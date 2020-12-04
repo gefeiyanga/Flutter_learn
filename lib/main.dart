@@ -160,8 +160,8 @@ class RouterTestRoute extends StatelessWidget {
     return Container(
       child: Column(
         children: <Widget>[
-//          TextField(fasf
           new RaisedButton(
+            child: Text('提示'),
             onPressed: () async {
               // 打开`TipRoute`，并等待返回结果
               var result = await Navigator.push(
@@ -178,7 +178,7 @@ class RouterTestRoute extends StatelessWidget {
             },
           ),
           new Text("打开提示页"),
-          new FocusTest(),
+          new FormTest(),
         ],
       ),
     );
@@ -490,73 +490,497 @@ class _TapboxCState extends State<TapboxC> {
   }
 }
 
-class FocusTest extends StatefulWidget {
+class FormTest extends StatefulWidget {
   @override
-  _FocusTestState createState() => new _FocusTestState();
+  _FormTestState createState() => new _FormTestState();
 }
 
-class _FocusTestState extends State<FocusTest> {
-  FocusNode focusNode1 = new FocusNode();
-  FocusNode focusNode2 = new FocusNode();
-  FocusScopeNode focusScopeNode;
+class _FormTestState extends State<FormTest> {
+//  FocusNode focusNode1 = new FocusNode();
+//  FocusNode focusNode2 = new FocusNode();
+//  FocusScopeNode focusScopeNode;
+
+  TextEditingController _unameController = new TextEditingController();
+  TextEditingController _pwdController = new TextEditingController();
+  GlobalKey _formKey = new GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(16.0),
-      child: Column(
+      child: Form(
+        key: _formKey,  // 设置globalKey，用于后面获取FormState
+        autovalidate: true,
+        child: Column(
+          children: <Widget>[
+
+//            RaisedButton(
+//              child: Text('去布局路由'),
+//              onPressed: () {
+//                Navigator.push(context,
+//                    MaterialPageRoute(builder: (context) {
+//                      return RowRoute();
+//                    })
+//                );
+//              }
+//            ),
+//            RaisedButton(
+//                child: Text('去流式布局路由'),
+//                onPressed: () {
+//                  Navigator.push(context,
+//                      MaterialPageRoute(builder: (context) {
+//                        return WrapRoute();
+//                      })
+//                  );
+//                }
+//            ),
+//            RaisedButton(
+//                child: Text('去层叠布局路由'),
+//                onPressed: () {
+//                  Navigator.push(context,
+//                      MaterialPageRoute(builder: (context) {
+//                        return StackRoute();
+//                      })
+//                  );
+//                }
+//            ),
+//            RaisedButton(
+//                child: Text('去对齐与相对定位布局路由'),
+//                onPressed: () {
+//                  Navigator.push(context,
+//                      MaterialPageRoute(builder: (context) {
+//                        return AlignRoute();
+//                      })
+//                  );
+//                }
+//            ),
+            RaisedButton(
+                child: Text('去对脚手架配置路由'),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) {
+                        return ScaffoldRoute();
+                      })
+                  );
+                }
+            ),
+            /*
+            * 进度条
+            * */
+
+            // 模糊进度条（绘执行一个动画）
+            LinearProgressIndicator(
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation(Colors.blue),
+              value: 1,
+            ),
+            // 进度显示50%
+            LinearProgressIndicator(
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation(Colors.blue),
+              value: .5,
+            ),
+            TextFormField(
+              autofocus: true,
+              controller: _unameController,
+              decoration: InputDecoration(
+                labelText: '请输入用户名',
+                hintText: '用户名或邮箱',
+                prefixIcon: Icon(Icons.person),
+                // 未获得焦点下划线设为灰色
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                // 获得焦点下划线为蓝色
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue),
+                ),
+                hintStyle: TextStyle(color: Colors.grey, fontSize: 13.0),
+                // 校验用户名
+              ),
+              validator: (v) {
+                return v.trim().length > 0 ? null : '用户名不能为空';
+              },
+            ),
+            TextFormField(
+              controller: _pwdController,
+              decoration: InputDecoration(
+                  labelText: "请输入密码",
+                  hintText: '您的登录密码',
+                  prefixIcon: Icon(Icons.lock),
+                  // 未获得焦点下划线设为灰色
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  // 获得焦点下划线为蓝色
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue),
+                  ),
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 13.0)
+              ),
+              validator: (v) {
+                return v.trim().length > 6 ? null : '密码不能少于六位';
+              },
+            ),
+            // 登录按钮
+            Padding(
+              padding: const EdgeInsets.only(top: 28.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: RaisedButton(
+                      padding: EdgeInsets.all(18.0),
+                      child: Text("登录"),
+                      color: Theme.of(context).primaryColor,
+                      textColor: Colors.white,
+                      onPressed: () {
+                        // 在这里不能通过此方式获得FormState, context不对
+                        // print(Form.of(context));
+
+                        // 通过_formKey.currentState获取FormState后
+                        // 调用validate()方法校验用户名、密码是否合法
+                        // 校验通过后在提交数据
+                        if((_formKey.currentState as FormState).validate()) {
+                          // 校验通过提交数据
+                          print('校验通过了...');
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+//            Builder(builder: (ctx) {
+//              return Column(
+//                children: <Widget>[
+//                  RaisedButton(
+//                      child: Text('移动焦点'),
+//                      onPressed: () {
+//                        // 将焦点从第一个TextField移动到第二个TextField
+//                        // 第一种写法：
+//                        // FocusScope.of(context).requestFocus(focusNode2);
+//                        // 第二种写法：
+//                        if(null == focusScopeNode) {
+//                          focusScopeNode = FocusScope.of(context);
+//                        }
+//                        focusScopeNode.requestFocus(focusNode2);
+//                      }
+//                  ),
+//                  RaisedButton(
+//                      child: Text("隐藏键盘"),
+//                      onPressed: () {
+//                        focusNode1.unfocus();
+//                        focusNode2.unfocus();
+//                      }
+//                  ),
+//                ],
+//              );
+//            })
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/*
+* Row
+* */
+
+class RowRoute extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('布局')
+      ),
+      body: Column(
+        // 测试Row对齐方式
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          TextField(
-            autofocus: true,
-            focusNode: focusNode1,
-            decoration: InputDecoration(
-              labelText: "input1"
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('Hello World!'),
+              Text("I'm lucy"),
+            ],
           ),
-          TextField(
-            focusNode: focusNode2,
-            decoration: InputDecoration(
-              labelText: "input2"
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('Hello World!'),
+              Text("I'm lucy"),
+            ],
           ),
-          Builder(builder: (ctx) {
-            return Column(
-              children: <Widget>[
-                RaisedButton(
-                  child: Text('移动焦点'),
-                  onPressed: () {
-                    // 将焦点从第一个TextField移动到第二个TextField
-                    // 第一种写法：
-                    // FocusScope.of(context).requestFocus(focusNode2);
-                    // 第二种写法：
-                    if(null == focusScopeNode) {
-                      focusScopeNode = FocusScope.of(context);
-                    }
-                    focusScopeNode.requestFocus(focusNode2);
-                  }
-                ),
-                RaisedButton(
-                  child: Text("隐藏键盘"),
-                  onPressed: () {
-                    focusNode1.unfocus();
-                    focusNode2.unfocus();
-                  }
-                ),
-              ],
-            );
-          })
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            textDirection: TextDirection.rtl,
+            children: <Widget>[
+              Text('Hello World!'),
+              Text("I'm lucy"),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            verticalDirection: VerticalDirection.up,
+            children: <Widget>[
+              Text('Hello World!',  style: TextStyle(fontSize: 30.0),),
+              Text("I'm lucy"),
+            ],
+          ),
         ],
       ),
     );
   }
 }
 
+// 流式布局
+class WrapRoute extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('流式布局'),),
+        body: Wrap(
+        spacing: 8.0,  // 主轴（水平）方向间距
+        runSpacing: 4.0,  // 纵轴（垂直）方向间距
+        alignment: WrapAlignment.center,  // 沿主轴方向居中
+        children: <Widget>[
+          new Chip(
+            avatar: new CircleAvatar(backgroundColor: Colors.blue, child: Text('A')),
+            label: Text('Hamilton'),
+          ),
+          new Chip(
+            avatar: new CircleAvatar(backgroundColor: Colors.blue, child: Text('M')),
+            label: Text('Lafayette'),
+          ),
+          new Chip(
+            avatar: new CircleAvatar(backgroundColor: Colors.blue, child: Text('H')),
+            label: Text('Mulligan'),
+          ),
+          new Chip(
+            avatar: new CircleAvatar(backgroundColor: Colors.blue, child: Text('J')),
+            label: Text('Laurens'),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+// 层叠布局
+class StackRoute extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: AppBar(title: Text('层叠布局'),),
+      body: new ConstrainedBox(
+        constraints: BoxConstraints.expand(),
+        child: Stack(
+          alignment: Alignment.center,  // 指定未定位或者部分定位的Widget的对其方式
+          fit: StackFit.expand,  // 未定位的Widget占满Stack整个空间
+          children: <Widget>[
+            Positioned(
+              left: 18.0,
+              child: Text('I am Jack')
+            ),
+            Container(
+              child: Text('Hello Wrold', style: TextStyle(color: Colors.white),),
+              color: Colors.red,
+            ),
+            Positioned(
+              top: 18.0,
+              child: Text('I am Lucy'),
+            )
+            // 可以看到，由于第二个子文本组件没有定位，所以fit属性会对它起作用，就会占满整个Stack。
+            // 由于Stack子元素是堆叠的，所以第一个子文本组件被第二个遮住了，而第三个在最上层，正常显示
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Align
+class AlignRoute extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('对齐'),),
+      body: Container(
+//        height: 120.0,
+//        width: 120.0,
+        color: Colors.blue[600],
+        child: Align(
+          widthFactor: 4,
+          heightFactor: 4,
+          // alignment: Alignment.topRight,
+          alignment: Alignment(1, 0.0),
+          child: FlutterLogo(
+            size: 60.0,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 
+// Scaffold TabBar 底部导航
 
+class ScaffoldRoute extends StatefulWidget{
 
+  @override
+  _ScaffoldRouteState createState() => _ScaffoldRouteState();
+}
 
+class _ScaffoldRouteState extends State<ScaffoldRoute>
+  with SingleTickerProviderStateMixin {
 
+  TabController _tabController;  // 需要定义一个controller
+  List tabs = ['新闻', '历史', '图片'];
+
+  int _selsectIndex = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    // 创建controller
+    _tabController = TabController(length: tabs.length, vsync: this);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: false,
+        title: Text('App Name'),
+        leading: Builder(builder: (context) {
+          return IconButton(
+            icon: Icon(Icons.dashboard, color: Colors.white,),
+            onPressed: () => Scaffold.of(context).openDrawer()  // 打开抽屉
+          );
+        },),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.share), onPressed: ()=>{}),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: tabs.map((e) => Tab(text: e)).toList(),
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: tabs.map((e) {
+          return Container(
+            alignment: Alignment.center,
+            child: Text(e, textScaleFactor: 4),
+          );
+        }).toList(),
+      ),
+      drawer: new MyDrawer(),  // 抽屉
+//      bottomNavigationBar: BottomNavigationBar(
+//        items: <BottomNavigationBarItem>[
+//          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+//          BottomNavigationBarItem(icon: Icon(Icons.business), label: 'Business'),
+//          BottomNavigationBarItem(icon: Icon(Icons.school), label: 'School'),
+//        ],
+//        currentIndex: _selsectIndex,
+//        fixedColor: Colors.blue,
+//        onTap: _onItemTapped,
+//      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        shape: CircularNotchedRectangle(),  // 底部导航栏打一个圆形的洞
+        child: Row(
+          children: [
+            IconButton(icon: Icon(Icons.home)),
+            SizedBox(), //中间位置空出
+            IconButton(icon: Icon(Icons.business)),
+          ],
+          mainAxisAlignment: MainAxisAlignment.spaceAround,  // 均分地步导航栏的横向空间
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: _onAdd,
+      ),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selsectIndex = index;
+    });
+  }
+
+  void _onAdd() {
+    print('点了悬浮按钮');
+  }
+}
+
+class MyDrawer extends StatefulWidget {
+
+  @override
+  _MyDrawerState createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: MediaQuery.removePadding(
+        context: context,
+        // 移除抽屉菜单顶部默认留白
+        removeTop: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 38.0),
+              child: Row(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ClipOval(
+                      child: Image.asset('imgs/dog.jpg',
+                        width: 60,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    "Variousdid",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                children: <Widget>[
+                  ListTile(
+                    leading: const Icon(Icons.add),
+                    title: const Text('Add account'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text('Manage accounts'),
+                  ),
+                ],
+              )
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 
 
