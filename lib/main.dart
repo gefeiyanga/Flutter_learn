@@ -17,6 +17,8 @@ class MyApp extends StatelessWidget {
         "new_page": (context) => NewRoute(),
         "home": (context) => MyHomePage(title: 'Flutter Demo Home page'),
         "observeStatePage": (context) => ObserveStateRoute(),
+        "CustomScrollViewTestPage": (context) => CustomScrollViewTest(),
+        "ScrollControllerTestRoute": (context) => ScrollControllerTestRoute(),
       },
     );
   }
@@ -876,10 +878,7 @@ class _ScaffoldRouteState extends State<ScaffoldRoute>
       body: TabBarView(
         controller: _tabController,
         children: tabs.map((e) {
-          return Container(
-            alignment: Alignment.center,
-            child: Text(e, textScaleFactor: 4),
-          );
+          return RenderContain(tabItem: e,);
         }).toList(),
       ),
       drawer: new MyDrawer(),  // 抽屉
@@ -981,6 +980,266 @@ class _MyDrawerState extends State<MyDrawer> {
     );
   }
 }
+
+class RenderContain extends StatelessWidget {
+  RenderContain({Key key, this.tabItem}) : super(key: key);
+  String tabItem;
+
+  @override
+  Widget build(BuildContext context) {
+    if(tabItem=='新闻') {
+//      String str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+//      return Scrollbar(
+//        child: SingleChildScrollView(
+//          padding: EdgeInsets.all(16.0),
+//          child: Center(
+//            child: Column(
+//              // 动态创建一个List<Widget>
+//              children: str.split('')
+//              // 每一个字母都用一个Text显示，字体为原来的两倍
+//                  .map((c) => Text(c, textScaleFactor: 2.0,))
+//                  .toList(),
+//            ),
+//          ),
+//        ),
+//      );
+      return InfiniteListView();
+    } else if(tabItem=='历史') {
+      return new ListView(
+        shrinkWrap: true,
+        padding: const EdgeInsets.all(20.0),
+        children: <Widget>[
+          const Text('I\'m dedicating every day to you'),
+          const Text('Domestic life was never quite my style'),
+          const Text('When you smile, you knock me out, I fall apart'),
+          const Text('And I thought I was so smart'),
+          RaisedButton(
+            child: Text('CustomScrollViewTest'),
+            highlightColor: Colors.blue[700],
+            color: Colors.blue,
+            colorBrightness: Brightness.dark,
+            onPressed: () => Navigator.pushNamed(context, 'CustomScrollViewTestPage',),
+          ),
+          RaisedButton(
+            child: Text('backTopTopPage'),
+            onPressed: () => Navigator.pushNamed(context, 'ScrollControllerTestRoute',),
+          ),
+        ],
+      );
+    } else if(tabItem=='图片') {
+      // 下划线widget预定义以供复用
+      Widget divider1 = Divider(color: Colors.blue,);
+      Widget divider2 = Divider(color: Colors.green,);
+      return ListView.separated(
+        itemCount: 100,
+        // 列表项构造器
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(title: Text("$index"));
+        },
+        // 分割器构造器
+        separatorBuilder: (BuildContext context, int index) {
+          return index%2==0?divider1:divider2;
+        },
+      );
+    }
+  }
+}
+
+// 无限加载的 列表
+
+class InfiniteListView extends StatefulWidget {
+  @override
+  _InfiniteListViewState createState() => new _InfiniteListViewState();
+}
+
+class _InfiniteListViewState extends State<InfiniteListView> {
+  static const loadingTag = "##loading##";  // 表尾标记
+  var _words = <String>[loadingTag];
+
+  @override
+  void initState() {
+    super.initState();
+    // 模拟请求数据
+    _retrieveData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: <Widget>[
+      ListTile(title: Text('商品列表'),),
+      Expanded(child: ListView.separated(
+        itemBuilder: (context, index) {
+          // 如果到了表尾
+          if(_words[index] == loadingTag) {
+            // 不足100条，继续获取数据
+            if(_words.length-1<100) {
+              // 获取数据
+              _retrieveData();
+              // 加载时显示loading
+              return Container(
+                padding: const EdgeInsets.all(16.0),
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 24.0,
+                  height: 24.0,
+                  child: CircularProgressIndicator(strokeWidth: 2.0,),
+                ),
+              );
+            } else {
+              // 已经加载了100条数据，不再获取数据
+              return Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(16.0),
+                child: Text('没有更多了', style: TextStyle(color: Colors.grey),),
+              );
+            }
+          }
+          // 显示单词列表项
+          return ListTile(title: Text(_words[index]),);
+        },
+        separatorBuilder: (context, index)=>Divider(height: 1.0,),
+        itemCount: _words.length,
+      )),
+    ],);
+  }
+
+  void _retrieveData() {
+    Future.delayed(Duration(seconds: 2)).then((e) {
+      setState(() {
+        // 重新构建列表
+        _words.insertAll(_words.length-1,
+          // 每次生成20个单词
+          generateWordPairs().take(20).map((e) => e.asPascalCase).toList()
+        );
+      });
+    });
+  }
+}
+
+// CustomScrollView
+class CustomScrollViewTest extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // 因为路由没有使用Scaffold，为了让子级Widget能使用
+    // Material Design默认样式风格，使用Material作为路由的根
+    return Material(
+      child: CustomScrollView(
+        slivers: <Widget>[
+          // AppBar，包含一个导航栏
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 250.0,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text('Demo'),
+              background: Image.asset('imgs/dog.jpg', fit: BoxFit.cover,),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(8.0),
+            sliver: new SliverGrid(  // Grid
+              gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,  // Grid按两列显示
+                mainAxisSpacing: 10.0,
+                crossAxisSpacing: 10.0,
+                childAspectRatio: 4.0,
+              ),
+              delegate: new SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  //  创建子Widget
+                  return new Container(
+                    alignment: Alignment.center,
+                    color: Colors.cyan[100 * (index % 9)],
+                    child: new Text('grid item $index'),
+                  );
+                },
+                childCount: 20
+              ),
+            )
+          ),
+          
+          // List
+          new SliverFixedExtentList(
+            delegate: new SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                // 创建列表项
+                return new Container(
+                  alignment: Alignment.center,
+                  color: Colors.lightBlue[100*(index % 9)],
+                );
+              },
+              childCount: 50,  // 50个列表项
+            ),
+            itemExtent: 50
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ScrollControllerTestRoute extends StatefulWidget {
+  @override
+  ScrollControllerTestRouteState createState() => new ScrollControllerTestRouteState();
+}
+
+class ScrollControllerTestRouteState extends State<ScrollControllerTestRoute> {
+
+  ScrollController _controller = new ScrollController();
+  bool showToTopBtn = false;  // 是否显示"返回到顶部"按钮
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 监听滚动事件，打印滚动位置
+    _controller.addListener(() {
+      print(_controller.offset);  // 打印滚动位置
+      if(_controller.offset < 1000 && showToTopBtn) {
+        setState(() {
+          showToTopBtn = false;
+        });
+      } else if (_controller.offset >= 1000 && showToTopBtn == false) {
+        setState(() {
+          showToTopBtn = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // 为了避免内存泄漏，需要调用_controller.dispose
+    _controller.dispose();
+    super.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('滚动控制')),
+      body: Scrollbar(
+        child: ListView.builder(
+          itemBuilder: (context, index) => ListTile(title: Text('$index'),),
+          itemCount: 100,
+          itemExtent: 50.0,  // 列表项高度固定时，显式指定高度是一个好习惯（性能消耗小）
+          controller: _controller,
+        )
+      ),
+      floatingActionButton: !showToTopBtn ? null : FloatingActionButton(
+          child: Icon(Icons.arrow_upward),
+          onPressed: () {
+            //返回到顶部时执行动画
+            _controller.animateTo(.0,
+                duration: Duration(milliseconds: 200),
+                curve: Curves.ease
+            );
+          }
+      ),
+    );
+  }
+}
+
 
 
 
