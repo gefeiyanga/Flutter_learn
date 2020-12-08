@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
+import 'stateFlow.dart';
+import 'shoppingCart.dart';
 
 void main() => runApp(new MyApp());
 
@@ -19,6 +21,8 @@ class MyApp extends StatelessWidget {
         "observeStatePage": (context) => ObserveStateRoute(),
         "CustomScrollViewTestPage": (context) => CustomScrollViewTest(),
         "ScrollControllerTestRoute": (context) => ScrollControllerTestRoute(),
+        "InheritedWidgetTestRoute": (context) => InheritedWidgetTestRoute(),
+        "ProviderRoute": (context) => ProviderRoute(),
       },
     );
   }
@@ -919,7 +923,7 @@ class _ScaffoldRouteState extends State<ScaffoldRoute>
   }
 
   void _onAdd() {
-    print('点了悬浮按钮');
+    Navigator.pushNamed(context, 'ProviderRoute');
   }
 }
 
