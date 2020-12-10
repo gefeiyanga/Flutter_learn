@@ -63,7 +63,10 @@ flutter:
     - imgs/avatar-default.png
     - imgs/logo_dark.png
     - imgs/logo_light.png
-
+  fonts:
+    - family: myIcon
+      fonts:
+        - asset: fonts/iconfont.ttf
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

@@ -15,7 +15,6 @@ class Git {
       "context": context,
       "followRedirects": false,
       "validateStatus": (status) { return status < 500; }
-
     });
   }
 
@@ -71,37 +70,19 @@ class Git {
     return User.fromJson(r.data);
   }
 
-//  // 获取用户项目列表
-//  Future<List<Repo>> getRepos(
-//    {Map<String, dynamic> queryParameters,  // query参数，用于接收分页信息
-//      refresh = false}) async {
-//    if (refresh) {
-//      // 列表下拉刷新，需要删除缓存（拦截器会读取这些信息）
-//      _options.extra.addAll({"refresh": true, "list": true});
-//    }
-//
-//
-//    var r = await dio.get<List>(
-//      "user/repos",
-//      queryParameters: queryParameters,
-//      options: _options,
-//    );
-//
-//    return r.data.map((e) => Repo.fromJson(e)).toList();
-//  }
 
   //获取用户项目列表
   Future<List<Repo>> getRepos(
       {Map<String, dynamic> queryParameters, //query参数，用于接收分页信息
-        refresh = false}) async {
+        refresh = false, userInfo}) async {
+    print(userInfo);
     if (refresh) {
       // 列表下拉刷新，需要删除缓存（拦截器中会读取这些信息）
       _options.extra.addAll({"refresh": true, "list": true});
     }
     try {
-      print(_options);
       var r = await dio.get<List>(
-        "user/repos",
+        "users/${userInfo.user.login}/repos",
         queryParameters: queryParameters,
         options: _options,
       );
@@ -109,6 +90,7 @@ class Git {
       return r.data.map((e) => Repo.fromJson(e)).toList();
     } catch (e) {
       print(e);
+      return [];
     }
   }
 }

@@ -31,13 +31,14 @@ class _HomeRouteState extends State<HomeRoute> {
     } else {
       //已登录，则显示项目列表
       return InfiniteListView<Repo>(
-        onRetrieveData: (int page, List<Repo> items, bool refresh) async {
+        onRetrieveData: (int page, List<Repo> items, bool refresh,) async {
           var data = await Git(context).getRepos(
             refresh: refresh,
             queryParameters: {
               'page': page,
-              'page_size': 20,
+              'per_page': 20,
             },
+            userInfo: userModel
           );
           //把请求到的新数据添加到items中
           items.addAll(data);
