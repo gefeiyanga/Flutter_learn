@@ -29,6 +29,8 @@ class Git {
     }
   ));
 
+
+
   static void init() {
     // 添加缓存插件
     dio.interceptors.add(Global.netCache);
