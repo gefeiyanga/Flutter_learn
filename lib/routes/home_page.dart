@@ -154,6 +154,13 @@ class MyDrawer extends StatelessWidget {
                           onPressed: () {
                             //该赋值语句会触发MaterialApp rebuild
                             userModel.user = null;
+                            // 清空所有缓存
+                            Global.netCache.cache.clear();
+                            // 更新profile中的token信息
+                            Global.profile.user = null;
+                            Global.profile.token = null;
+                            print('user: ${Global.profile.user}');
+                            print('token: ${Global.profile.token}');
                             Navigator.pop(context);
                           },
                         ),

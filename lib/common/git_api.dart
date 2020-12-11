@@ -33,7 +33,7 @@ class Git {
   static void init() {
     // 添加缓存插件
     dio.interceptors.add(Global.netCache);
-    // 设置用户token（可能为null，代表为登录）
+    // 设置用户token（可能为null，代表未登录）
     dio.options.headers[HttpHeaders.authorizationHeader] = Global.profile.token;
 
     // 在调试模式下需要抓包调试，所以使用代理，并禁用HTTPS证书校验
@@ -53,21 +53,25 @@ class Git {
   // 登录接口，登录成功后返回用户信息
   Future<User> login(String login, String pwd) async {
     String basic = 'Basic'+ base64.encode(utf8.encode('$login:$pwd'));
-    var r = await dio.get(
-      '/users/$login',
-      options: _options.merge(headers: {
-        HttpHeaders.authorizationHeader: basic
-      }, extra: {
-        "noCache": true,  // 本地接口禁用缓存
-      })
-    );
-    // 登录成功后更新公共头（authorization），此后所有请求都会带上用户身份信息
-    dio.options.headers[HttpHeaders.authorizationHeader] = basic;
-    // 清空所有缓存
-    Global.netCache.cache.clear();
-    // 更新profile中的token信息
-    Global.profile.token = basic;
-    return User.fromJson(r.data);
+    try {
+      var r = await dio.get(
+          '/users/$login',
+          options: _options.merge(headers: {
+            HttpHeaders.authorizationHeader: basic
+          }, extra: {
+            "noCache": true,  // 本地接口禁用缓存
+          })
+      );
+      // 登录成功后更新公共头（authorization），此后所有请求都会带上用户身份信息
+      dio.options.headers[HttpHeaders.authorizationHeader] = basic;
+      // 清空所有缓存
+      Global.netCache.cache.clear();
+      // 更新profile中的token信息
+      Global.profile.token = basic;
+      return User.fromJson(r.data);
+    } catch (e) {
+      print('e: $e');
+    }
   }
 
 

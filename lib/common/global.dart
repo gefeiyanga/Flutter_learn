@@ -29,9 +29,12 @@ class Global {
   // 初始化全局信息，会在app启动时执行
   static Future init() async {
     _prefs = await SharedPreferences.getInstance();
+//    print('_prefs: $_prefs');
     var _profile = _prefs.getString('profile');
     if(_profile != null) {
       try {
+//        print('1${jsonDecode(_profile)}');
+//        print('2${Profile.fromJson(jsonDecode(_profile))}');
         profile = Profile.fromJson(jsonDecode(_profile));
       } catch(e) {
         print(e);
